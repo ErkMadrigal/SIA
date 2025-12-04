@@ -14,6 +14,9 @@
               <li class="nav-item">
                 <a class="nav-link" id="banco-tab" data-toggle="tab" href="#banco" role="tab" aria-controls="banco" aria-selected="false">Bancario</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" id="biometrico-tab" data-toggle="tab" href="#biometrico" role="tab" aria-controls="biometrico" aria-selected="false">Biometrico</a>
+              </li>
             </ul>
             <div class="row mt-5 align-items-center">
               <!-- <div class="col-md-3 text-center mb-5">
@@ -35,6 +38,9 @@
                     <p class="small mb-0 text-muted" id="NSS"></p>
                   </div>
                 </div>
+              </div>
+              <div class="col">
+                  <img src="" alt="Foto Empleado" id="avatar" class="img-fluid rounded" style="width:8rem; display: none;">
               </div>
             </div>
             <hr class="my-4">
@@ -194,6 +200,24 @@
                       </div>
                     </div>
                     <button class="btn btn-primary btn-block" id="updateBanco">Actualizar</button>
+                  </form>
+                </div>
+                <div class="tab-pane fade" id="biometrico" role="tabpanel" aria-labelledby="biometrico-tab">
+                  <form class="needs-invalidation-biometrico" noinvalidate>
+                    <div class="form-row">
+                      <div class="col-md-6 mb-3">
+                        <button class="btn btn-primary btn-block mt-3" id="btnFoto"><i class="fe fe-aperture fe-16"></i> Subir foto</button>
+                        <input type="file" id="fotoEmpleado" accept="image/*" style="display: none;">
+                      </div>
+                      <div class="col-md-6"></div>
+                      <div class="col-md-12 mb-3" style="width: 80%;">
+                        <div id="fotoEmpleadoPreview" class="text-center">
+                          <img src="" alt="Foto Empleado" id="fotoEmpleadoImg" class="img-fluid rounded" style="display: none;">
+                        </div>
+
+                      </div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="updateFotos">Actualizar</button>
                   </form>
                 </div>
               </div>

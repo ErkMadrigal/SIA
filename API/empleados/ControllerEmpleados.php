@@ -211,5 +211,131 @@
             
         }
 
+        
+        public static function newQR($id_empleado, $token){
+            try{
+                $creado_en = date("Y-m-d H:i:s");
+                
+                $sql = "INSERT INTO tokens_qr (token, id_empleado, creado_en) VALUES (:token, :id_empleado, :creado_en)";
+                $db = self::$database::getConnection();
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(":token", $token);
+                $stmt->bindParam(":id_empleado", $id_empleado);
+                $stmt->bindParam(":creado_en", $creado_en);
+                $stmt->execute();
+
+                self::$respuesta["status"] = "ok";
+                self::$respuesta["mensaje"] = "El token se ha sido regitrado correctamente";
+            } catch (RuntimeException $e) {
+                self::$respuesta["status"] = "error";
+                self::$respuesta["mensaje"] = $e->getMessage();
+            }catch(PDOException $e){
+                self::$respuesta["status"] = "error";
+                self::$respuesta["mensaje"] = $e->getMessage();
+            }
+            return self::$respuesta;
+            
+        }
+
+        public static function setToken($id_empleado){
+            try{
+                $sql = "SELECT * FROM tokens_qr 
+                        WHERE token = :token 
+                        AND usado = 0 
+                        AND NOW() <= DATE_ADD(creado_en, INTERVAL 5 MINUTE)";
+                
+                $dbc = self::$database::getConnection();
+                $stmt = $dbc->prepare($sql);
+                $stmt->bindParam(":token", $token);
+                $stmt->execute();
+                $tokenData = $stmt->fetch(PDO::FETCH_ASSOC);  
+
+                if (!$tokenData) {
+                    http_response_code(403);
+                    self::$respuesta["status"] = "error";
+                    self::$respuesta["mensaje"] = "Token inválido o expirado";
+                    self::$respuesta["data"] = [];
+                    return self::$respuesta; // ⚠️ salir si no hay token
+                }
+
+                // Registrar asistencia
+                $stmt = $dbc->prepare("INSERT INTO asistencias (id_empleado, fecha, hora, id_token) VALUES (?, CURDATE(), CURTIME(), ?)");
+                $stmt->execute([$tokenData['id_empleado'], $tokenData['id']]);
+
+                // Marcar token como usado
+                $stmt = $dbc->prepare("UPDATE tokens_qr SET usado = 1 WHERE id = ?");
+                $stmt->execute([$tokenData['id']]);
+
+                // Respuesta exitosa
+                self::$respuesta["status"] = "ok";
+                self::$respuesta["mensaje"] = "Asistencia registrada";
+                self::$respuesta["data"] = $tokenData;
+
+            }catch(PDOException $e){
+                self::$respuesta["status"] = "error";
+                self::$respuesta["data"] = [];
+                self::$respuesta["mensaje"] = $e->getMessage();
+            }
+
+            return self::$respuesta;
+        }
+
+        public static function setAsistenciaEntradaSalida($id_empleado, $latitud, $longitud, $ip, $id_status){
+            try{
+
+                
+                $sql = "INSERT INTO asistencias (id_empleado, fecha, hora, latitud, longitud, ip, id_status) VALUES (:id_empleado, CURDATE(), CURTIME(), :latitud, :longitud, :ip, :id_status)";
+
+                $db = self::$database::getConnection();
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(":id_empleado", $id_empleado);
+                $stmt->bindParam(":latitud", $latitud);
+                $stmt->bindParam(":longitud", $longitud);
+                $stmt->bindParam(":ip", $ip);
+                $stmt->bindParam(":id_status", $id_status);
+                $stmt->execute();
+
+                // Respuesta exitosa
+                self::$respuesta["status"] = "ok";
+                if( $id_status == 1 ){
+                    self::$respuesta["mensaje"] = "Asistencia registrada";
+                }
+                if( $id_status == 2 ){
+                    self::$respuesta["mensaje"] = "Salida registrada";
+                }
+
+            }catch(PDOException $e){
+                self::$respuesta["status"] = "error";
+                self::$respuesta["data"] = [];
+                self::$respuesta["mensaje"] = $e->getMessage();
+            }
+
+            return self::$respuesta;
+        }
+
+        public static function updatePhoto($photo, $id){
+            try{
+                
+                $sql = "UPDATE empleados SET fotos = :fotos WHERE id = :id";
+                $db = self::$database::getConnection();
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(":fotos", $photo); 
+                $stmt->bindParam(":id", $id);
+
+                $stmt->execute();
+                $lastInsertID = $id;
+
+                self::$respuesta["status"] = "ok";
+                self::$respuesta["mensaje"] = "Foto Actualizada";
+                
+            } catch (RuntimeException $e) {
+                self::$respuesta["status"] = "error";
+                self::$respuesta["mensaje"] = $e->getMessage();
+            }catch(PDOException $e){
+                self::$respuesta["status"] = "error";
+                self::$respuesta["mensaje"] = $e->getMessage();
+            }
+            return self::$respuesta;
+        }
 
     }

@@ -90,7 +90,6 @@
             return self::$respuesta;
         }
 
-
         public static function getEmpleado($id_empleado){
             try{
                 $id_empleado = intval($id_empleado);
@@ -196,6 +195,109 @@
             return self::$respuesta;
         }
 
+        public static function getExistEmpleadoBiometrico($query){
+            try {
+                $sql = "SELECT 
+                        e.id, CONCAT(e.nombre, ' ', e.paterno, ' ', e.materno) AS nombreCompleto, 
+                        e.no_empleado, e.curp, e.rfc, e.fotos
+                        FROM empleados e
+                        WHERE (curp LIKE :query OR rfc LIKE :query)";
+
+                $dbc = self::$database::getConnection();
+                $stmt = $dbc->prepare($sql);
+
+                // Agregamos el comodín para la búsqueda
+                $busqueda = '%' . $query . '%';
+                $stmt->bindParam(":query", $busqueda, PDO::PARAM_STR);
+
+                $stmt->execute();
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                self::$respuesta["status"] = "ok";
+                self::$respuesta["data"] = $data;
+
+            } catch(PDOException $e) {
+
+                self::$respuesta["status"] = "error";
+                self::$respuesta["data"] = [];
+                self::$respuesta["mensaje"] = $e->getMessage();
+            }
+
+
+            return self::$respuesta;
+
+        }
+
+        public static function getDataEmpleadoBiometrico($query){
+            try {
+                $sql = "SELECT 
+                        e.id, CONCAT(e.nombre, ' ', e.paterno, ' ', e.materno) AS nombreCompleto, 
+                        e.no_empleado, e.curp, e.rfc, e.fotos, a.id, a.latitud, a.longitud, a.fecha, a.hora, a.id_status
+                        FROM empleados e
+                        LEFT JOIN asistencias a ON e.id = a.id_empleado
+                        WHERE (curp LIKE :query OR rfc LIKE :query) AND DATE(a.fecha) = CURDATE() AND a.id_status in (1,2) order by a.id desc limit 1";
+
+                $dbc = self::$database::getConnection();
+                $stmt = $dbc->prepare($sql);
+
+                // Agregamos el comodín para la búsqueda
+                $busqueda = '%' . $query . '%';
+                $stmt->bindParam(":query", $busqueda, PDO::PARAM_STR);
+
+                $stmt->execute();
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                self::$respuesta["status"] = "ok";
+                self::$respuesta["data"] = $data;
+
+            } catch(PDOException $e) {
+
+                self::$respuesta["status"] = "error";
+                self::$respuesta["data"] = [];
+                self::$respuesta["mensaje"] = $e->getMessage();
+            }
+
+
+            return self::$respuesta;
+
+        }
+
+        public static function getEmpleadoBiometrico($query){
+            try {
+                $sql = "SELECT 
+                            id, 
+                            CONCAT(nombre, ' ', paterno, ' ', materno) AS nombreCompleto, 
+                            no_empleado,
+                            curp, 
+                            rfc,
+                            fotos
+                        FROM empleados 
+                        WHERE (curp LIKE :query OR rfc LIKE :query)";
+
+                $dbc = self::$database::getConnection();
+                $stmt = $dbc->prepare($sql);
+
+                // Agregamos el comodín para la búsqueda
+                $busqueda = '%' . $query . '%';
+                $stmt->bindParam(":query", $busqueda, PDO::PARAM_STR);
+
+                $stmt->execute();
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                self::$respuesta["status"] = "ok";
+                self::$respuesta["data"] = $data;
+
+            } catch(PDOException $e) {
+
+                self::$respuesta["status"] = "error";
+                self::$respuesta["data"] = [];
+                self::$respuesta["mensaje"] = $e->getMessage();
+            }
+
+
+            return self::$respuesta;
+
+        }
         
     }
     

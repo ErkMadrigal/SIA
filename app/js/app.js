@@ -27,7 +27,9 @@ let dominio = window.location.origin
 window.env = {
   // API_URL: "http://localhost/serprosep_interno/API/",
   API_URL: dominio+"/SIA/API/",
-  API_KEY: "k8sd7f9a2v1b4mzqp0xlj5ngtu3wrceh"
+  URL: dominio+"/SIA/app/",
+  API_KEY: "k8sd7f9a2v1b4mzqp0xlj5ngtu3wrceh",
+  API: "a5da54250240419999df7a0dfa36cd3d"
 };
 
 // === Funciones ===

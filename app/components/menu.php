@@ -103,7 +103,42 @@
                 <span class="badge badge-pill badge-primary">New</span>
               </a>
             </li>
-            
+          </ul>
+           <p class="text-muted nav-heading mt-4 mb-1">
+            <span>Asistencias</span>
+          </p>
+          <ul class="navbar-nav flex-fill w-100 mb-2">
+            <li class="nav-item dropdown">
+              <a href="asistencia" class="nav-link">
+                <i class="fe fe-navigation-2 fe-16"></i>
+                <span class="ml-3 item-text">Capturar</span>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a href="generar-QR" class="nav-link">
+                <i class="fe fe-code fe-16"></i>
+                <span class="ml-3 item-text">Generar QR</span>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a href="entrada-Biometrico" class="nav-link">
+                <i class="fe fe-aperture fe-16"></i>
+                <span class="ml-3 item-text">Entrada Biometrico</span>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a href="salida-Biometrico" class="nav-link">
+                <i class="fe fe-aperture fe-16"></i>
+                <span class="ml-3 item-text">Salida Biometrico</span>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a href="registrar-Biometrico" class="nav-link">
+                <i class="fe fe-aperture fe-16"></i>
+                <span class="ml-3 item-text">Registrar Biometrico</span>
+              </a>
+            </li>
+          </ul>
         </nav>
       </aside>
       <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">

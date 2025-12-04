@@ -144,5 +144,55 @@
             include "./components/footer.php";
         break;
 
+        case 'asistencia':
+            $title = "asistencia";
+            $links = [''];
+            include "./components/header.php";
+            include "./components/menu.php";
+            include "$ruta/asistencia/capturar.php";
+            $scripts = ['https://unpkg.com/html5-qrcode','js/asistencias.js'];
+            include "./components/footer.php";
+        break;
+
+        case 'generar-QR':
+            $title = "generar-QR";
+            $links = [''];
+            include "./components/header.php";
+            include "./components/menu.php";
+            include "$ruta/asistencia/genQr.php";
+            $scripts = ['https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js','js/qr.js'];
+            include "./components/footer.php";
+        break;
+
+        case 'entrada-Biometrico':
+            $title = "entrada Biometrico";
+            $links = [''];
+            include "./components/header.php";
+            include "./components/menu.php";
+            include "$ruta/asistencia/entrada_biometrico.php";
+            $scripts = ['js/entrada-biometrico.js'];
+            include "./components/footer.php";
+        break;
+
+        case 'salida-Biometrico':
+            $title = "salida Biometrico";
+            $links = [''];
+            include "./components/header.php";
+            include "./components/menu.php";
+            include "$ruta/asistencia/salida_biometrico.php";
+            $scripts = ['js/salida-biometrico.js'];
+            include "./components/footer.php";
+        break;
+
+    case 'registrar-Biometrico':
+            $title = "registrar Biometrico";
+            $links = [''];
+            include "./components/header.php";
+            include "./components/menu.php";
+            include "$ruta/asistencia/genQr.php";
+            $scripts = [];
+            include "./components/footer.php";
+        break;
+
     }
     

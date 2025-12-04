@@ -26,6 +26,12 @@ RewriteRule ^colaborador$ index.php?dir=colaborador [L,QSA]
 
 RewriteRule ^multicatalogo$ index.php?dir=multicatalogo [L,QSA]
 
+RewriteRule ^asistencia$ index.php?dir=asistencia [L,QSA]
+RewriteRule ^generar-QR$ index.php?dir=generar-QR [L,QSA]
+RewriteRule ^entrada-Biometrico$ index.php?dir=entrada-Biometrico [L,QSA]
+RewriteRule ^salida-Biometrico$ index.php?dir=salida-Biometrico [L,QSA]
+RewriteRule ^registrar-Biometrico$ index.php?dir=registrar-Biometrico [L,QSA]
+
 
 # Página de error personalizada
 ErrorDocument 404 /404.html

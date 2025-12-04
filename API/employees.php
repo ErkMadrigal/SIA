@@ -31,8 +31,10 @@ define('API_KEY', $_ENV['API_KEY'] ?? '');
 $rawInput = file_get_contents("php://input");
 $data = json_decode($rawInput, true);
 
+if (!$data) $data = $_POST;
+
 // Validar JSON
-if ($data === null || !isset($data['action'])) {
+if (!isset($data['action']) || empty($data['action'])) {
     echo json_encode(["status" => "error", "message" => "JSON inválido o sin acción"], JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -213,7 +215,7 @@ switch ($opcion) {
         break;
 
     case "getEmpleado":
-       if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $jwt = getBearerToken();
 
             if (!$jwt) {
@@ -296,8 +298,6 @@ switch ($opcion) {
         }
         break;
     case "actualizarEmpleado":
-        
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $jwt = getBearerToken();
 
@@ -339,6 +339,253 @@ switch ($opcion) {
                     // echo json_encode(
                     //     $empleados::actualizarPersonal($data['id'], $data['status'], $data['motivo_baja'], $data['finiquito'], $data['nota_baja'], $data['fecha_baja']), JSON_UNESCAPED_UNICODE
                     // );
+            } catch (Exception $e) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT inválido: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "Método no permitido"], JSON_UNESCAPED_UNICODE);
+        }
+        break;
+    case "updatePhoto":
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $jwt = getBearerToken();
+
+            if (!$jwt) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT no proporcionado"], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+
+            try {
+                $decoded = JWT::decode($jwt, new Key($_ENV['JWT_SECRET'], 'HS256'));
+
+                $id_empleado = $data['id_empleado'];
+                $nombreFoto = $data['nombreFoto'];
+
+                if (!isset($_FILES['foto'])) {
+                    echo json_encode(["status"=>"error", "message"=>"No se envió la imagen"]);
+                    exit;
+                }
+
+                $tmp = $_FILES['foto']['tmp_name'];
+                $destino = "../app/photos/" . $nombreFoto;
+
+                if (move_uploaded_file($tmp, $destino)) {
+                    $empleados = new ControllerEmpleados();
+                    $res = $empleados::updatePhoto($nombreFoto, $id_empleado);
+
+                    if($res['status'] === 'ok'){
+                        echo json_encode(["status"=>"ok","message"=>"Foto actualizada"]);
+                    }else{
+                        echo json_encode(["status"=>"error","message"=>"Error al actualizar la foto"]);
+                    }
+
+                } else {
+                    echo json_encode(["status"=>"error","message"=>"Error al guardar imagen"]);
+                }
+
+                // var_dump($data);
+                // var_dump($_FILES);
+                // Campos requeridos
+                    // $empleados = new ControllerEmpleados();
+                    // echo json_encode(
+                    //     $empleados::updatePhoto($data['id_empleado'], $data['foto']), JSON_UNESCAPED_UNICODE
+                    // );
+            } catch (Exception $e) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT inválido: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "Método no permitido"], JSON_UNESCAPED_UNICODE);
+        }
+
+        break;
+    case "getQr":
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $jwt = getBearerToken();
+
+            if (!$jwt) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT no proporcionado"], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+
+            try {
+                $decoded = JWT::decode($jwt, new Key($_ENV['JWT_SECRET'], 'HS256'));
+
+                    $empleados = new ControllerEmpleados();
+                    $token = $data['id_empleado'] . '-' . time();
+                    $empleados::newQR($data['id_empleado'], $token);
+                    echo json_encode(
+                        ["status" => "success", "qr_token" => $token],
+                        JSON_UNESCAPED_UNICODE
+                    );
+                            
+            } catch (Exception $e) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT inválido: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "Método no permitido"], JSON_UNESCAPED_UNICODE);
+        }
+        break;
+
+
+    case "setQr":
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $jwt = getBearerToken();
+
+            if (!$jwt) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT no proporcionado"], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+
+            try {
+                $decoded = JWT::decode($jwt, new Key($_ENV['JWT_SECRET'], 'HS256'));
+
+                    $empleados = new ControllerEmpleados();
+                    $empleadosConsultas = new ConsultasEmpleados();
+
+                    
+
+                    $token = $data['token'] ?? '';
+                    if (!$token) {
+                        echo json_encode(
+                            ["status" => "error", "message" => "Token QR no proporcionado"],
+                            JSON_UNESCAPED_UNICODE
+                        );
+                        exit();
+                    }
+                    
+                    $asistencia = $empleados::setToken($token);
+
+                    echo json_encode($asistencia, JSON_UNESCAPED_UNICODE);
+                            
+            } catch (Exception $e) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT inválido: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "Método no permitido"], JSON_UNESCAPED_UNICODE);
+        }
+        break;
+    case "getEmpleadoBiometrico":
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $jwt = getBearerToken();
+
+            if (!$jwt) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT no proporcionado"], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+
+            try {
+                $decoded = JWT::decode($jwt, new Key($_ENV['JWT_SECRET'], 'HS256'));
+
+                // Campos requeridos
+                    $empleados = new ConsultasEmpleados();
+
+                    $getEmpleadoBiometrico = $empleados::getDataEmpleadoBiometrico($data['query']);
+
+                    $salida = $data['salida'] ?? false;
+
+                    if($salida){
+                        if(count($getEmpleadoBiometrico["data"]) == 0 || $getEmpleadoBiometrico["data"][0]["id_status"] == 2){
+                            echo json_encode(
+                                ["status" => "error", "message" => "Empleado no tiene registro de entrada para el día de hoy"],
+                                JSON_UNESCAPED_UNICODE
+                            );
+                            exit();
+    
+                        }
+                    }else{
+                        $getEmpleadoBiometricoExiste = $empleados::getEmpleadoBiometrico($data['query']);
+
+                        if(count($getEmpleadoBiometricoExiste["data"]) > 0){
+
+                            if(count($getEmpleadoBiometrico["data"]) == 0 ){
+                                 echo json_encode(
+                                    $getEmpleadoBiometricoExiste, JSON_UNESCAPED_UNICODE
+                                );
+                                exit();
+                            
+                            }
+                            
+                            if($getEmpleadoBiometrico["data"][0]["id_status"] == 1 ){
+                                echo json_encode(
+                                    ["status" => "error", "message" => "Empleado ya se encuentra registrado en el sistema de asistencia para el día de hoy"],
+                                    JSON_UNESCAPED_UNICODE
+                                );
+                                exit();
+                            }
+                        }else{
+                            echo json_encode(
+                                ["status" => "error", "message" => "Empleado no encontrado, verifique sus datos"],
+                                JSON_UNESCAPED_UNICODE
+                            );
+                            exit();
+                        }
+                        
+                    }
+
+                    echo json_encode(
+                        $retunrnData, JSON_UNESCAPED_UNICODE
+                    );
+            } catch (Exception $e) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT inválido: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "Método no permitido"], JSON_UNESCAPED_UNICODE);
+        }
+
+        break;
+    case "registroEmpleadoBiometrico":
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $jwt = getBearerToken();
+
+            if (!$jwt) {
+                http_response_code(401);
+                echo json_encode(["status" => "error", "message" => "Token JWT no proporcionado"], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+
+            try {
+                $decoded = JWT::decode($jwt, new Key($_ENV['JWT_SECRET'], 'HS256'));
+
+                    $empleados = new ControllerEmpleados();
+                    $empleadosConsultas = new ConsultasEmpleados();
+
+                    
+                    $id_empleado = $data['id_empleado'] ?? '';
+                    $latitud = $data['lat'] ?? '';
+                    $longitud = $data['lon'] ?? '';    
+                    $ip = $data['ip'] ?? '';    
+                    
+                    $salida = $data['salida'] ?? false;
+
+                    if (!$id_empleado && !$latitud && !$longitud && !$ip) {
+                        echo json_encode(
+                            ["status" => "error", "message" => "Datos no proporcionado"],
+                            JSON_UNESCAPED_UNICODE
+                        );
+                        exit();
+                    }
+
+                    
+                    $id_status = $salida ? 2 : 1; // 1 Entrada 2 Salida
+                    
+                    $asistencia = $empleados::setAsistenciaEntradaSalida($id_empleado, $latitud, $longitud, $ip, $id_status);
+
+                    echo json_encode($asistencia, JSON_UNESCAPED_UNICODE);
+                            
             } catch (Exception $e) {
                 http_response_code(401);
                 echo json_encode(["status" => "error", "message" => "Token JWT inválido: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);

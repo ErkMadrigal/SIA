@@ -39,6 +39,9 @@ const API_BASE_URL_EMPLEADOS = window.env.API_URL + 'employees';
   let banco = document.querySelector("#banco"); 
   let institucionBancaria = document.querySelector("#institucionBancaria");
 
+
+  let avatar = document.querySelector("#avatar");
+
   let data_json = {
     "action": "getEmpleado",
     "id_empleado": id
@@ -66,6 +69,10 @@ const API_BASE_URL_EMPLEADOS = window.env.API_URL + 'employees';
     CURP.innerText = "CURP " + (usr.curp ? usr.curp : '');
     RFC.innerText = "RFC " + (usr.rfc ? usr.rfc : '');
     NSS.innerText = "NSS " + (usr.nss ? usr.nss : '');
+    if(usr.fotos != null && usr.fotos != ""){
+      avatar.style.display = "block";
+      avatar.src = window.env.URL + "photos/" + usr.fotos;
+    }
 
     nombre.value = usr.nombre;
     paterno.value = usr.paterno;
@@ -298,3 +305,102 @@ const bancario = async (event) => {
 }
 
 document.querySelector("#updateBanco").addEventListener("click", bancario);
+
+document.querySelector("#btnFoto").onclick = async (e) => {
+  e.preventDefault();
+  e.stopPropagation(); 
+  document.querySelector("#fotoEmpleado").click();
+};
+
+
+document.querySelector("#fotoEmpleado").addEventListener("change", function () {
+  const file = this.files[0];
+  const previewImg = document.querySelector("#fotoEmpleadoImg");
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      previewImg.src = e.target.result;
+      previewImg.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.querySelector("#updateFotos").onclick = async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const fileInput = document.querySelector("#fotoEmpleado");
+  const file = fileInput.files[0];
+  if (!file){
+    Swal.fire({
+        title: "Es requerida una foto",
+        icon: "error",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Cerrar",
+        timer: 2000
+    })
+  } 
+
+  // 📌 Generar nombre automático
+  const now = new Date();
+  const fecha = now.getFullYear()
+    + String(now.getMonth() + 1).padStart(2, "0")
+    + String(now.getDate()).padStart(2, "0")
+    + "_" 
+    + String(now.getHours()).padStart(2, "0")
+    + String(now.getMinutes()).padStart(2, "0")
+    + String(now.getSeconds()).padStart(2, "0");
+
+  const newFileName = `${fecha}.jpg`;
+
+  console.log(file)
+  let data_json = {
+      action: "updatePhoto",
+      foto: file,
+      id, // Ahora id está definido en el ámbito global
+      nombreFoto: newFileName,
+  };
+
+  const formData = new FormData();
+  formData.append("action", "updatePhoto");
+  formData.append("foto", file);
+  formData.append("id_empleado", id);
+  formData.append("nombreFoto", newFileName);
+    
+  try {
+    const response = await fetch(API_BASE_URL_EMPLEADOS, {
+      method: 'POST',
+      headers: {
+        // 'Content-Type': 'application/json',
+        'X-API-KEY': window.env.API_KEY,
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      // body: JSON.stringify(data_json)
+      body: formData
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+
+    Swal.fire({
+        title: data.message,
+        icon: "success",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Cerrar",
+        timer: 3000
+    }).then((res) => {
+        if (res.isConfirmed) {
+            window.location.reload();
+        }
+    });
+
+    setTimeout(() => {
+        window.location.reload();
+    }, 3000);
+
+  }catch (error) {
+    console.error('Error al obtener datos:', error);
+  }
+  
+}
