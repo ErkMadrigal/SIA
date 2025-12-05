@@ -103,6 +103,7 @@ const renderTablaEmpleados = (lista = []) => {
           <div class="dropdown-menu dropdown-menu-right">
             <a class="dropdown-item" href="empleado/${value.id}">Editar</a>
             <button data-bs-toggle="button" class="dropdown-item btn" onclick='baja(${value.id}, "${value.nombre}")'>Baja</button>
+            <button data-bs-toggle="button" class="dropdown-item btn" onclick='incidencia(${value.id}, "${value.nombre}")'>Incidencia</button>
           </div>
         </div>
       </td>
@@ -122,6 +123,12 @@ const baja = (id, nombre) => {
   $('#defaultModal').modal('show');
   document.getElementById("empleadoModal").innerText = nombre;
   document.getElementById("id_empleado").value = id;
+}
+
+const incidencia = (id, nombre) => {
+  $('#incidenciaModal').modal('show');
+  document.getElementById("empleadoIncidenciaModal").innerText = nombre;
+  document.getElementById("id_empleado_incidencia").value = id;
 }
 
 const confirmarBaja = async () => {
@@ -173,6 +180,12 @@ const confirmarBaja = async () => {
   }else{
     formulario.classList.add('was-validated');
   }
+}
+
+
+const confirmarIncidencia = async () => {
+
+  const formulario = document.querySelector('.needs-validation-incidencia');  
 }
 
 const badgeClasses = {

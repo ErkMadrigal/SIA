@@ -183,16 +183,5 @@
             $scripts = ['js/salida-biometrico.js'];
             include "./components/footer.php";
         break;
-
-    case 'registrar-Biometrico':
-            $title = "registrar Biometrico";
-            $links = [''];
-            include "./components/header.php";
-            include "./components/menu.php";
-            include "$ruta/asistencia/genQr.php";
-            $scripts = [];
-            include "./components/footer.php";
-        break;
-
     }
     

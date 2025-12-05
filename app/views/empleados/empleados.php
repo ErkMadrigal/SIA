@@ -206,4 +206,51 @@
 
     </div>
 
+    <div class="modal fade" id="incidenciaModal" tabindex="-1" role="dialog" aria-labelledby="incidenciaModalLabel" aria-hidden="true">
+      <form class="needs-validation-incidencia" novalidate>
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="empleadoIncidenciaModal"></h5>
+              <input type="hidden" name="id_empleado_incidencia" id="id_empleado_incidencia">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body row">
+                <div class='col-12 col-sm-12 col-md-12'>
+                    <div class="form-group">
+                        <label for="motivo" class=" control-label">Motivo de Incidencia:<span class="text-danger">*</span></label>
+                        <select class="form-control" id="motivoIncidencia" name="motivoIncidencia" required>
+                            <option value="">Selecciona una Opcion</option>
+                                          
+                        </select>
+                        <div class="invalid-feedback"> El campo es requerido </div>
+                    </div>
+                </div>
+                <div class='col-12 col-sm-12 col-md-12'>
+                    <div class="form-group">
+                        <label for="motivo" class=" control-label">Descripcion:<span class="text-danger">*</span></label>
+                        <textarea type="text" class="form-control " id="notaBaja" name="notaBaja"></textarea>
+                        <div class="invalid-feedback"> El campo es requerido </div>
+                    </div>
+                </div>
+                <div class='col-12 col-sm-12 col-md-12'>
+                    <div class="form-group">
+                        <label for="motivo" class=" control-label">Dia (s) de la Incidencias:<span class="text-danger">*</span></label>
+                        <input type="text" name="datetimes" class="form-control datetimes">
+                        <div class="invalid-feedback"> El campo es requerido </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Cerrar</button>
+              <button type="button" class="btn mb-2 btn-primary" onclick="confirmarIncidencia()">Procesar Incidencia</button>
+            </div>
+          </div>
+        </div>
+      </form> 
+
+    </div>
+
 </main

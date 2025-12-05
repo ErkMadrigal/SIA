@@ -114,7 +114,7 @@
                 <span class="ml-3 item-text">Capturar</span>
               </a>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown d-none">
               <a href="generar-QR" class="nav-link">
                 <i class="fe fe-code fe-16"></i>
                 <span class="ml-3 item-text">Generar QR</span>
@@ -132,12 +132,7 @@
                 <span class="ml-3 item-text">Salida Biometrico</span>
               </a>
             </li>
-            <li class="nav-item dropdown">
-              <a href="registrar-Biometrico" class="nav-link">
-                <i class="fe fe-aperture fe-16"></i>
-                <span class="ml-3 item-text">Registrar Biometrico</span>
-              </a>
-            </li>
+            
           </ul>
         </nav>
       </aside>
